@@ -20,6 +20,6 @@ public class RandomWord {
      * @return a Set of Characters
      */
     public static Set<Character> charsInNthPlace(List<String> words, int n) {
-
+        return null;
     }
 }
