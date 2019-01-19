@@ -12,6 +12,19 @@ public class RandomWord {
       */
 	private final int SMALL = 20;
 
+    public static void main( String[] args ) {
+        //todo
+
+        System.out.println("Chooses random letters until a complete word existing in a specific list of " +
+                "words is assembled");
+        // If a GUI is implemented, offer choice of CLI or GUI here
+        // If more than one WordService is implemented, offer choice of WordSevice here
+        // Ask for desired maximum word length
+
+        // create RandomWord instance
+        // execute generateWord method
+    }
+
     public RandomWord(int maxLength, WordService wordService, RandomWordUI ui) {
         //todo
     }
