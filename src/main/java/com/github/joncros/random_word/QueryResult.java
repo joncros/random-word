@@ -1,7 +1,6 @@
 package com.github.joncros.random_word;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds results of a query to a WordService
@@ -9,9 +8,18 @@ import java.util.Set;
 public class QueryResult {
     private List<String> words;
 
+    public QueryResult(List<String> words) {
+        // todo handle bad parameters
+        this.words = words;
+    }
+
+    public QueryResult(String[] words) {
+        // todo handle bad parameters
+        this.words = new ArrayList<>(Arrays.asList(words));
+    }
+
     public int getNumberOfWords() {
-        //todo
-        return 0;
+        return words.size();
     }
 
     /**
@@ -19,24 +27,27 @@ public class QueryResult {
      * @return an array holding all of the Strings in the result
      */
     public String[] getWords() {
-        //todo
-        return null;
+        return (String[]) words.toArray();
     }
 
     /**
      * Searches this result for words starting with a string
      * @param s String that matching words should start with
-     * @param wordLength length that matching words should be
-     * @return
+     * @return a new QueryResult containing all matching words
      */
-    public QueryResult findWordsStartingWith(String s, int wordLength) {
-        //todo
+    public QueryResult findWordsStartingWith(String s) {
+        //todo tests
+        List<String> newList = new ArrayList<>();
+        int length = s.length();
+        for (String word : words) {
+            if (word.length() >= s.length()) {
+                String subStr = word.substring(0,length);
+                if (subStr.equals(s))
+                    newList.add(word);
+            }
+        }
 
-        // Create new List of Strings
-        // for each String in words
-            // if substring from 0 to length of s is equal to s
-                // add word to new list
-        return null;
+        return new QueryResult(newList);
     }
 
     /**
@@ -47,7 +58,12 @@ public class QueryResult {
      * have a letter in the nth place (that is, if n is greater than length-1 for all words in the QueryResult)
      */
     public Set<Character> charsInNthPlace(int n) {
-        //todo
-        return null;
+        //todo tests
+        Set<Character> chars = new HashSet<>();
+        for (String word : words) {
+            if (n < word.length())
+                chars.add(word.charAt(n));
+        }
+        return chars;
     }
 }
