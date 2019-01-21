@@ -1,12 +1,14 @@
 package com.github.joncros.random_word;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds results of a query to a WordService
  */
 public class QueryResult {
     private List<String> words;
+    //private Map<Integer,String> wordsByLength;
 
     public QueryResult(List<String> words) {
         // todo handle bad parameters
@@ -18,7 +20,7 @@ public class QueryResult {
         this.words = new ArrayList<>(Arrays.asList(words));
     }
 
-    public int getNumberOfWords() {
+    public int getSize() {
         return words.size();
     }
 
@@ -31,21 +33,50 @@ public class QueryResult {
     }
 
     /**
+     * Gets the words in the result that have a certain length
+     * @param length length of each of the words that should be included
+     * @return an array of words
+     */
+    public QueryResult getWords(int length) {
+        List<String> newList = words.stream()
+                .filter(word -> word.length() == length)
+                .collect(Collectors.toList());
+        return new QueryResult(newList);
+    }
+
+    public QueryResult getWordsWithMaxLength(int maxLength) {
+        List<String> newList = words.stream()
+                .filter(word -> word.length() <= maxLength)
+                .collect(Collectors.toList());
+        return new QueryResult(newList);
+    }
+
+    /**
      * Searches this result for words starting with a string
      * @param s String that matching words should start with
      * @return a new QueryResult containing all matching words
      */
     public QueryResult findWordsStartingWith(String s) {
         //todo tests
-        List<String> newList = new ArrayList<>();
         int length = s.length();
+        List<String> newList;
+
+        /*
+         * Loop implementation
+         * newList = new ArrayList<>();
         for (String word : words) {
-            if (word.length() >= s.length()) {
+            if (word.length() >= length) {
                 String subStr = word.substring(0,length);
                 if (subStr.equals(s))
                     newList.add(word);
             }
         }
+         */
+
+        newList = words.stream()
+                .filter(word -> word.length() >= length)
+                .filter(word -> word.substring(0, length).equals(s))
+                .collect(Collectors.toList());
 
         return new QueryResult(newList);
     }
