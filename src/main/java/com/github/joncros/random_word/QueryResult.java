@@ -11,12 +11,12 @@ public class QueryResult {
     //private Map<Integer,String> wordsByLength;
 
     public QueryResult(List<String> words) {
-        // todo handle bad parameters
+        Objects.requireNonNull(words);
         this.words = words;
     }
 
     public QueryResult(String[] words) {
-        // todo handle bad parameters
+        Objects.requireNonNull(words);
         this.words = new ArrayList<>(Arrays.asList(words));
     }
 
@@ -29,7 +29,7 @@ public class QueryResult {
      * @return an array holding all of the Strings in the result
      */
     public String[] getWords() {
-        return (String[]) words.toArray();
+        return words.toArray(new String[0]);
     }
 
     /**
@@ -38,6 +38,8 @@ public class QueryResult {
      * @return an array of words
      */
     public QueryResult getWords(int length) {
+        if (length < 1)
+            throw new IllegalArgumentException("length must be at least 1");
         List<String> newList = words.stream()
                 .filter(word -> word.length() == length)
                 .collect(Collectors.toList());
@@ -45,6 +47,8 @@ public class QueryResult {
     }
 
     public QueryResult getWordsWithMaxLength(int maxLength) {
+        if (maxLength < 1)
+            throw new IllegalArgumentException("maxLength must be at least 1");
         List<String> newList = words.stream()
                 .filter(word -> word.length() <= maxLength)
                 .collect(Collectors.toList());
@@ -57,8 +61,10 @@ public class QueryResult {
      * @return a new QueryResult containing all matching words
      */
     public QueryResult findWordsStartingWith(String s) {
-        //todo tests
+        Objects.requireNonNull(s);
         int length = s.length();
+        if (length == 0)
+            throw new IllegalArgumentException("parameter s must have length of at least 1");
         List<String> newList;
 
         /*
@@ -89,7 +95,8 @@ public class QueryResult {
      * have a letter in the nth place (that is, if n is greater than length-1 for all words in the QueryResult)
      */
     public Set<Character> charsInNthPlace(int n) {
-        //todo tests
+        if (n < 0)
+            throw new IllegalArgumentException("n cannot be less than 0");
         Set<Character> chars = new HashSet<>();
         for (String word : words) {
             if (n < word.length())

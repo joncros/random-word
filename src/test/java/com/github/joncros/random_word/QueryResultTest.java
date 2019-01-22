@@ -18,14 +18,16 @@ class QueryResultTest {
 
     @Nested
     @DisplayName("constructor tests")
-    class costructorTests {
+    class constructorTests {
 
+        @Test
         @DisplayName("constructing from a list when list null")
         void constructFromListNull() {
             ArrayList<String> list = null;
             assertThrows(NullPointerException.class, () -> new QueryResult(list));
         }
 
+        @Test
         @DisplayName("constructing from a String[] when String[] null")
         void constructFromArrayNull() {
             String[] array = null;
@@ -111,6 +113,13 @@ class QueryResultTest {
             queryResult = queryResult.findWordsStartingWith("b");
             int size = queryResult.getSize();
             assertEquals(0, size);
+        }
+
+        @Test
+        @DisplayName("tests findWordsStartingWith using a null String reference as the parameter")
+        void findWordsStartingWithNullString() {
+            String string = null;
+            assertThrows(NullPointerException.class, () -> queryResult.findWordsStartingWith(string));
         }
 
         @Test
