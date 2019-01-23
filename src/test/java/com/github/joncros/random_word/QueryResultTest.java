@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class QueryResultTest {
     private QueryResult queryResult;
 
+
+
     @Nested
     @DisplayName("constructor tests")
     class constructorTests {
@@ -73,6 +75,29 @@ class QueryResultTest {
         @DisplayName("tests getWords(int length) when length parameter is negative")
         void getWordsLengthNegative() {
             assertThrows(IllegalArgumentException.class, () -> queryResult.getWords(-2));
+        }
+
+        @Test
+        void getWordsInLengthRange() {
+            queryResult = queryResult.getWordsInLengthRange(6,7);
+            String[] expected = {"ardency", "ardent", "aready"};
+            String[] result = queryResult.getWords();
+            Arrays.sort(result);
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
+        @DisplayName("tests getWordsInLengthRange when minLength less than one")
+        void getWordsInLengthRangeMinLessThanOne() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> queryResult.getWordsInLengthRange(0, 5));
+        }
+
+        @Test
+        @DisplayName("tests getWordsInLengthRange when minLength > maxLength")
+        void getWordsInLengthRangeMinGreaterThanMax() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> queryResult.getWordsInLengthRange(6,5));
         }
 
         @Test

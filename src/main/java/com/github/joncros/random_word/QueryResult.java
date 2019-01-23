@@ -46,6 +46,29 @@ public class QueryResult {
         return new QueryResult(newList);
     }
 
+    /**
+     * Finds the words in a QueryResult that fall within a range of lengths
+     * @param minLength minimum length of words to include
+     * @param maxLength maximum length of words to include
+     * @return a new QueryResult containing the words
+     */
+    public QueryResult getWordsInLengthRange(int minLength, int maxLength) {
+        if (minLength < 1)
+            throw new IllegalArgumentException("minLength must be at least 1");
+        if (minLength > maxLength)
+            throw new IllegalArgumentException("minLength cannot be greater than maxLength");
+        List<String> newList = words.stream()
+                .filter(word -> word.length() <= maxLength)
+                .filter(word -> word.length() >= minLength)
+                .collect(Collectors.toList());
+        return new QueryResult(newList);
+    }
+
+    /**
+     * Finds the words in a QueryResult whose length does not exceed a limit
+     * @param maxLength maximum length of words to include
+     * @return a new QueryResult containing the words
+     */
     public QueryResult getWordsWithMaxLength(int maxLength) {
         if (maxLength < 1)
             throw new IllegalArgumentException("maxLength must be at least 1");
