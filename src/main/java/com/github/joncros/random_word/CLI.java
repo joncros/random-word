@@ -24,7 +24,7 @@ public class CLI implements RandomWordUI
      * @param s the current word
      */
     public void display(String s) {
-        System.out.print("%n" + s);
+        System.out.print("\n" + s);
     }
 
     /**

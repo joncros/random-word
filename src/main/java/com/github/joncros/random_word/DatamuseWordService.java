@@ -11,6 +11,7 @@ import java.util.List;
 public class DatamuseWordService implements WordService {
     private DatamuseQuery datamuseQuery;
     private JSONParse jsonParse;
+    private final String[] EMPTY_ARRAY = {};
 
     public DatamuseWordService() {
         datamuseQuery = new DatamuseQuery(1000);
@@ -26,7 +27,10 @@ public class DatamuseWordService implements WordService {
     public QueryResult findWordsStartingWith(String s) {
         //todo tests?
         String resultString = datamuseQuery.wordsStartingWith(s);
-        String[] resultArray = jsonParse.parseWords(resultString);
+        String[] resultArray = EMPTY_ARRAY;
+        if (!resultString.equals("[]")) {   //if wordsStartingWith did not return an empty JSON result
+            resultArray = jsonParse.parseWords(resultString);
+        }
         return new QueryResult(resultArray);
     }
 
@@ -41,7 +45,10 @@ public class DatamuseWordService implements WordService {
         //todo tests?
         int length = wordLength - s.length();
         String resultString = datamuseQuery.wordsStartingWith(s, wordLength);
-        String[] resultArray = jsonParse.parseWords(resultString);
+        String[] resultArray = EMPTY_ARRAY;
+        if (!resultString.equals("[]")) {   //if wordsStartingWith did not return an empty JSON result
+            resultArray = jsonParse.parseWords(resultString);
+        }
         return new QueryResult(resultArray);
     }
 }
