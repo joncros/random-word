@@ -33,6 +33,6 @@ public class CLI implements RandomWordUI
      */
     @Override
     public void displayFinalWord(String s) {
-        System.out.println("The word is " + s);
+        System.out.println("\nThe word is " + s);
     }
 }
