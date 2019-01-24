@@ -11,13 +11,14 @@ public class QueryResult {
     //private Map<Integer,String> wordsByLength;
 
     public QueryResult(List<String> words) {
+        //todo defensive copy
         Objects.requireNonNull(words);
-        this.words = words;
+        this.words = new ArrayList<>(words);
     }
 
     public QueryResult(String[] words) {
         Objects.requireNonNull(words);
-        this.words = new ArrayList<>(Arrays.asList(words));
+        this.words = new ArrayList<>(Arrays.asList(words.clone()));
     }
 
     public int getSize() {

@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import javax.management.Query;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,12 +27,41 @@ class QueryResultTest {
         }
 
         @Test
+        @DisplayName("testing constructing from a list to ensure list is defensively copied")
+        void constructFromListCopyTest() {
+            String first = "a";
+            String second = "apple";
+            List<String> list = new ArrayList<>();
+            list.add(first);
+            list.add(second);
+            queryResult = new QueryResult(list);
+            list.set(1, "orange");
+
+            String[] expected = {"a", "apple"};
+            String[] result = queryResult.getWords();
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
         @DisplayName("constructing from a String[] when String[] null")
         void constructFromArrayNull() {
             String[] array = null;
             assertThrows(NullPointerException.class, () -> new QueryResult(array));
         }
 
+        @Test
+        @DisplayName("testing constructing from a String[] to ensure array is defensively copied")
+        void constructFromArrayCopyTest() {
+            String first = "a";
+            String second = "apple";
+            String[] array = {first, second};
+            queryResult = new QueryResult(array);
+            array = new String[]{"a", "orange"};
+
+            String[] expected = {"a", "apple"};
+            String[] result = queryResult.getWords();
+            assertArrayEquals(expected, result);
+        }
     }
 
     @Nested
