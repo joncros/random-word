@@ -17,7 +17,7 @@ public class RandomWord {
       */
 	private final int SMALL = 20;
 
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws InterruptedException {
         System.out.println("Chooses random letters until a complete word existing in a specific list of " +
                 "words is assembled.");
         Scanner in = new Scanner(System.in);
@@ -47,7 +47,7 @@ public class RandomWord {
         this.stringBuilder = new StringBuilder(maxLength);
     }
 
-    public String generateWord() {
+    public String generateWord() throws InterruptedException {
 		/*
 		* Generate first two letters. append them to stringBuilder and display each in ui
 		*/
@@ -71,6 +71,13 @@ public class RandomWord {
             }
             else if (result.getSize() == 1) {
                 chosenWord = result.getWords()[0];
+
+                /*
+                * displays the remaining characters (not displayed in previous iterrations) of the final word.
+                * stringBuilder holds the letters displayed so far, so stringBuilder.length()
+                * is equal to the index of the first letter not yet displayed
+                 */
+                ui.displayFinalWord(chosenWord, stringBuilder.length());
                 break;
             }
             else if (result.getSize() <= SMALL) {
@@ -85,9 +92,6 @@ public class RandomWord {
                 ui.display(c);
             }
         }
-        if(chosenWord.equals(""))
-            chosenWord = stringBuilder.toString();
-        ui.displayFinalWord(chosenWord);
         return chosenWord;
     }
 }
