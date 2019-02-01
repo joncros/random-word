@@ -40,14 +40,18 @@ public class RandomWord {
         ui.display(second);
 
         String chosenWord = "";
+
+        QueryResult result = wordService.findWordsStartingWith(stringBuilder.toString())
+                .getWordsInLengthRange(minLength, maxLength);
+
         while (stringBuilder.length() < maxLength) {
-            QueryResult result = wordService.findWordsStartingWith(stringBuilder.toString());
-            result = result.getWordsInLengthRange(minLength, maxLength);
             if (result.getSize() == 0) {
-                //replace last letter with a new letter
+                //replace last letter with a new letter, assign new word list to result
                 char c = letterGenerator.generate();
                 stringBuilder.setCharAt(stringBuilder.length()-1, c);
                 ui.display(stringBuilder.toString());
+                result = wordService.findWordsStartingWith(stringBuilder.toString())
+                        .getWordsInLengthRange(minLength, maxLength);
             }
             else if (result.getSize() == 1) {
                 chosenWord = result.getWords()[0];
@@ -65,11 +69,13 @@ public class RandomWord {
                 char c = letterGenerator.generate(possibleLetters);
                 stringBuilder.append(c);
                 ui.display(c);
+                result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
             }
             else {
                 char c = letterGenerator.generate();
                 stringBuilder.append(c);
                 ui.display(c);
+                result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
             }
         }
         return chosenWord;
