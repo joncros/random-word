@@ -120,6 +120,7 @@ public class QueryResult {
         if (position < 0)
             throw new IllegalArgumentException("parameter position cannot be less than zero");
         List<String> newList = words.stream()
+                .filter(word -> word.length() > position)
                 .filter(word -> word.charAt(position) == c)
                 .collect(Collectors.toList());
 

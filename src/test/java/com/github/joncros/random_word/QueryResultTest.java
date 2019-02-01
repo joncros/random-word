@@ -193,6 +193,16 @@ class QueryResultTest {
         }
 
         @Test
+        @DisplayName("tests findWordsWithLetter when position > String.length()-1 for at least one " +
+                "String in the result")
+        void findWordsWithLetterPositionTooLarge() {
+            queryResult = queryResult.findWordsWithLetter('y', 6);
+            String[] expected = {"ardency"};
+            String[] result = queryResult.getWords();
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
         void charsInNthPlace() {
             Set<Character> expected = new HashSet<>();
             expected.add('d');
