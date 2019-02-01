@@ -111,6 +111,22 @@ public class QueryResult {
     }
 
     /**
+     * Finds the words in the QueryResult that have a specified character in the specified position
+     * @param c char that should be contained in each matching word
+     * @param position index in each word at which c should be at; must be greater than or equal to zero
+     * @return a QueryResult containing the matching words
+     */
+    public QueryResult findWordsWithLetter(char c, int position) {
+        if (position < 0)
+            throw new IllegalArgumentException("parameter position cannot be less than zero");
+        List<String> newList = words.stream()
+                .filter(word -> word.charAt(position) == c)
+                .collect(Collectors.toList());
+
+        return new QueryResult(newList);
+    }
+
+    /**
      * Returns a Set consisting of all of the characters occuring in the nth position of the words in the QueryResult.
      * i.e. for the words apple, orange, grape, if n = 2 the set would contain a and p
      * @param n position in each of the words to examine. n=0 examines the first letter in each word.

@@ -13,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class QueryResultTest {
     private QueryResult queryResult;
 
-
-
     @Nested
     @DisplayName("constructor tests")
     class constructorTests {
@@ -177,6 +175,21 @@ class QueryResultTest {
         @DisplayName("tests findWordsStartingWith using a zero-length string as the parameter")
         void findWordsStartingWithZeroLengthString() {
             assertThrows(IllegalArgumentException.class, () -> queryResult.findWordsStartingWith(""));
+        }
+
+        @Test
+        void findWordsWithLetter() {
+            queryResult = queryResult.findWordsWithLetter('d', 2);
+            String[] expected = {"ardency", "ardent", "ardently"};
+            String[] result = queryResult.getWords();
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
+        @DisplayName("tests findWordsWithLetter when position parameter is negative")
+        void findWordsWithLetterNegativePosition() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> queryResult.findWordsWithLetter('a', -1));
         }
 
         @Test
