@@ -1,11 +1,10 @@
-package com.github.joncros.random_word;
+package com.github.joncros.random_word.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import javax.management.Query;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;

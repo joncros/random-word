@@ -1,7 +1,5 @@
-package com.github.joncros.random_word;
+package com.github.joncros.random_word.core;
 
-import java.io.File;
-import java.util.Scanner;
 import java.util.Set;
 
 public class RandomWord {

@@ -1,4 +1,4 @@
-package com.github.joncros.random_word;
+package com.github.joncros.random_word.core;
 
 import java.io.*;
 import java.nio.file.Files;

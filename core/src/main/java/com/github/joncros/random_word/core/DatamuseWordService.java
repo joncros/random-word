@@ -1,9 +1,7 @@
-package com.github.joncros.random_word;
+package com.github.joncros.random_word.core;
 
 import datamuse.DatamuseQuery;
 import datamuse.JSONParse;
-
-import java.util.List;
 
 /**
  * Queries the Datamuse RESTful API for matching words

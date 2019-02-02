@@ -1,6 +1,4 @@
-package com.github.joncros.random_word;
-
-import java.util.List;
+package com.github.joncros.random_word.core;
 
 /**
  * Interface for querying an (online or offline) word list for matching words
