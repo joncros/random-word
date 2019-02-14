@@ -5,8 +5,9 @@ public interface RandomWordUI {
     /**
      * Called to display the next character of the word being assembled
      * @param c a single char
+     * @param index position within the word at which c occurs
      */
-    void display(char c);
+    void display(char c, int index);
 
     /**
      * Called to display the word so far. Intended for use after a letter has been replaced

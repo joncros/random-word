@@ -15,8 +15,17 @@ public class CLI implements RandomWordUI
      * Prints the character to standard output
      * @param c a single char
      */
-    public void display(char c) {
+    private void display(char c) {
         System.out.print(c);
+    }
+
+    /**
+     * Prints the character to standard output.
+     * @param c a single char
+     * @param index (unused) position within the word at which c occurs
+     */
+    public void display(char c, int index) {
+        display(c);
     }
 
     /**

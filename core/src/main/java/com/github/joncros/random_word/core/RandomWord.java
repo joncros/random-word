@@ -31,11 +31,11 @@ public class RandomWord {
 		*/
         char first = letterGenerator.generate();
         stringBuilder.append(first);
-        ui.display(first);
+        ui.display(first, 0);
 
         char second = letterGenerator.generate();
         stringBuilder.append(second);
-        ui.display(second);
+        ui.display(second, 1);
 
         String chosenWord = "";
 
@@ -66,13 +66,13 @@ public class RandomWord {
                 Set<Character> possibleLetters = result.charsInNthPlace(stringBuilder.length());
                 char c = letterGenerator.generate(possibleLetters);
                 stringBuilder.append(c);
-                ui.display(c);
+                ui.display(c, stringBuilder.length());
                 result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
             }
             else {
                 char c = letterGenerator.generate();
                 stringBuilder.append(c);
-                ui.display(c);
+                ui.display(c, stringBuilder.length());
                 result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
             }
         }
