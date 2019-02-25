@@ -1,6 +1,12 @@
 package com.github.joncros.random_word.gui;
 
+import com.github.joncros.random_word.core.RandomWordUI;
+import com.github.joncros.random_word.core.WordService;
 import eu.hansolo.fx.spinner.*;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -10,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -19,43 +26,61 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import java.io.File;
+import java.security.Key;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class Gui extends Application {
-    private static final int NUM_SPINNERS_INITIAL = 10;
-    private static final int MAX_WORD_LENGTH = 30;
+public class Gui extends Application implements RandomWordUI {
+    static final int MAX_WORD_LENGTH = 10;
+    static final int NUM_SPINNERS_INITIAL = MAX_WORD_LENGTH;
+
+    // Number of seconds a CanvasSpinnner should take to cycle from 'A' to ' '
+    static final int CYCLE_DURATION = 7;
 
     private Scene scene;
 
-    private List<CanvasSpinner> spinners;
+    List<CanvasSpinner> spinners;
+    char[] chars;  //holds the target letter for each spinner
+    List<Timeline> timelines; //holds the timeline for each spinner
 
-    private Button generateButton;
-    private EventHandler<ActionEvent> buttonEventHandler;
+    Button generateButton;
+    //final EventHandler<ActionEvent> buttonEventHandler; = actionEvent -> test.animate(this);
 
-    private Label sourceLabel = new Label("Word Source");
-    private ChoiceBox<Object> sourceChoiceBox;
-    private ObjectProperty<Object> choiceBoxValueProperty;
-    private final Object DatamuseChoice = new Object();
-    private final Object TextfileChoice = new Object();
+    Label sourceLabel = new Label("Word Source");
+    ChoiceBox<Object> sourceChoiceBox;
+    ObjectProperty<Object> choiceBoxValueProperty;
+    enum WORD_SERVICES {
+        DATAMUSE,
+        TEXTFILE;
+    };
 
-    private Label minLabel= new Label("Min Length");
-    private Spinner<Integer> minLengthSpinner;
-    private Label maxLabel = new Label("Max Length");
-    private Spinner<Integer> maxLengthSpinner;
+    Label minLabel= new Label("Min Length");
+    Spinner<Integer> minLengthSpinner;
+    Label maxLabel = new Label("Max Length");
+    Spinner<Integer> maxLengthSpinner;
 
     @Override
     public void init() {
         //create NUM_SPINNERS_INITIAL spinnners
         spinners = new ArrayList<>();
+        chars = new char[NUM_SPINNERS_INITIAL];
         for (int i = 0; i < NUM_SPINNERS_INITIAL; i++) {
             spinners.add(i, new CanvasSpinner(SpinnerType.ALPHABETIC));
         }
+        timelines = new ArrayList<>();
+
+//        Display ' ' initially on all spinners
+//        for (int i = 0; i < NUM_SPINNERS_INITIAL; i++) {
+//            spinners.get(i).setValue(27);
+//        }
 
         //create button
         generateButton = new Button("Generate Word");
@@ -64,13 +89,15 @@ public class Gui extends Application {
 
         //create control to choose word source
         sourceChoiceBox = new ChoiceBox<>();
-        sourceChoiceBox.getItems().addAll(DatamuseChoice, TextfileChoice);
+        sourceChoiceBox.getItems().addAll(WORD_SERVICES.values());
         sourceChoiceBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Object o) {
-                if (o == DatamuseChoice) return "DataMuse";
-                else if (o == TextfileChoice) return "Text File";
-                else {
+                if (o == WORD_SERVICES.DATAMUSE) {
+                    return "DataMuse";
+                } else if (o == WORD_SERVICES.TEXTFILE) {
+                    return "Text File";
+                } else {
                     File file = (File) o;
                     return file.getName();
                 }
@@ -78,21 +105,23 @@ public class Gui extends Application {
 
             @Override
             public Object fromString(String s) {
-                if (s.equals("DataMuse")) return DatamuseChoice;
-                else if (s.equals("Text File")) return TextfileChoice;
-                else {
-                    File file = new File(s);
-                    return file;
+                if (s.equals("DataMuse")) {
+                    return WORD_SERVICES.DATAMUSE;
+                } else {
+                    if (s.equals("Text File")) {
+                        return WORD_SERVICES.TEXTFILE;
+                    } else {
+                        return new File(s);
+                    }
                 }
             }
         });
         choiceBoxValueProperty = sourceChoiceBox.valueProperty();
         choiceBoxValueProperty.addListener((observableValue, o, n) -> {
-            if (n == TextfileChoice) {
+            if (n == WORD_SERVICES.TEXTFILE) {
                 choiceBoxTextFileChosen();
             }
         });
-
 
         //create controls to choose word length
         minLengthSpinner = new Spinner<>(0, MAX_WORD_LENGTH, 5);
@@ -107,7 +136,7 @@ public class Gui extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         HBox spinnerBox = new HBox();
-        spinnerBox.getChildren().setAll(spinners);
+        spinnerBox.getChildren().addAll(spinners);
 
         HBox controls = new HBox(sourceLabel, sourceChoiceBox, minLabel, minLengthSpinner, maxLabel, maxLengthSpinner);
         controls.setSpacing(10);
@@ -122,6 +151,7 @@ public class Gui extends Application {
         stage.setTitle("Generate Random Words");
         stage.setScene(scene);
         stage.show();
+
     }
 
     public static void main(String[] args) {
@@ -148,5 +178,46 @@ public class Gui extends Application {
         }
 
         return selected;
+    }
+
+    /*
+    Converts a char into the int value, in the range 0-27, required to display it on a
+    eu.hansolo.fx alphabetic Spinner. Alphabetic spinners have the characters A-Z and space.
+    lowercase letters are converted to uppercase, and any non-letter character is converted to
+    a space.
+    */
+    int convert(char c) {
+        if (c == ' ') {
+            return 27;
+        }
+        else if (c >= 65 && c <= 90) {  //uppercase letters
+            return c - 65;
+        }
+        else if (c >= 97 && c <= 122) {  //lowercase letters, c - 65 - 32
+            return c - 97;
+        }
+        else {  //character not present on Alphabetic spinners
+            return 27;
+        }
+    }
+
+
+    @Override
+    public void display(char c, int index) {
+        chars[index] = c;
+    }
+
+    @Override
+    public void display(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            chars[i] = s.charAt(i);
+        }
+    }
+
+    @Override
+    public void displayFinalWord(String s, int startIndex) throws InterruptedException {
+        for (int i = startIndex; i < s.length(); i++) {
+            chars[i] = s.charAt(i);
+        }
     }
 }
