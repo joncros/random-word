@@ -1,7 +1,6 @@
 package com.github.joncros.random_word;
 
-import java.io.File;
-import java.util.Scanner;
+import java.io.IOException;
 import java.util.Set;
 
 public class RandomWord {
@@ -27,7 +26,7 @@ public class RandomWord {
         this.stringBuilder = new StringBuilder(maxLength);
     }
 
-    public String generateWord() throws InterruptedException {
+    public String generateWord() throws InterruptedException, IOException {
 		/*
 		* Generate first two letters. append them to stringBuilder and display each in ui
 		*/

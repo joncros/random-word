@@ -17,15 +17,14 @@ public class TextFileWordService implements WordService{
      *                 on each line of the file, and should be alphabetized.
      * @throws UncheckedIOException wrapping a FileNotFoundException if the file does not exist
      */
-    public TextFileWordService(File textFile) {
+    public TextFileWordService(File textFile) throws FileNotFoundException {
         if ( !Files.exists(textFile.toPath()) )
-            throw new UncheckedIOException(
-                    new FileNotFoundException("File not found: " + textFile.toString()));
+            throw new FileNotFoundException("File not found: " + textFile.toString());
         this.textFile = textFile;
     }
 
     @Override
-    public QueryResult findWordsStartingWith(String s) {
+    public QueryResult findWordsStartingWith(String s) throws  IOException {
         List<String> result = new ArrayList<>();
         try (BufferedReader in
                      = new BufferedReader(new FileReader(textFile))) {
@@ -42,14 +41,12 @@ public class TextFileWordService implements WordService{
                     }
                 }
             }
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
         }
         return new QueryResult(result);
     }
 
     @Override
-    public QueryResult findWordsStartingWith(String s, int wordLength) {
+    public QueryResult findWordsStartingWith(String s, int wordLength) throws IOException {
         List<String> result = new ArrayList<>();
         try (BufferedReader in
                      = new BufferedReader(new FileReader(textFile))) {
@@ -66,8 +63,6 @@ public class TextFileWordService implements WordService{
                     }
                 }
             }
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
         }
         return new QueryResult(result);
     }

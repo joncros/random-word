@@ -3,7 +3,7 @@ package com.github.joncros.random_word;
 import datamuse.DatamuseQuery;
 import datamuse.JSONParse;
 
-import java.util.List;
+import java.io.IOException;
 
 /**
  * Queries the Datamuse RESTful API for matching words
@@ -24,9 +24,12 @@ public class DatamuseWordService implements WordService {
      * @return a QueryResult holding the matching words
      */
     @Override
-    public QueryResult findWordsStartingWith(String s) {
+    public QueryResult findWordsStartingWith(String s) throws IOException {
         //todo tests?
         String resultString = datamuseQuery.wordsStartingWith(s);
+        if (resultString == null) {
+            throw new IOException("DataMuse service not available");
+        }
         String[] resultArray = EMPTY_ARRAY;
         if (!resultString.equals("[]")) {   //if wordsStartingWith did not return an empty JSON result
             resultArray = jsonParse.parseWords(resultString);
@@ -41,10 +44,13 @@ public class DatamuseWordService implements WordService {
      * @return a QueryResult holding the matching words
      */
     @Override
-    public QueryResult findWordsStartingWith(String s, int wordLength) {
+    public QueryResult findWordsStartingWith(String s, int wordLength) throws IOException{
         //todo tests?
         int length = wordLength - s.length();
         String resultString = datamuseQuery.wordsStartingWith(s, wordLength);
+        if (resultString == null) {
+            throw new IOException("DataMuse service not available");
+        }
         String[] resultArray = EMPTY_ARRAY;
         if (!resultString.equals("[]")) {   //if wordsStartingWith did not return an empty JSON result
             resultArray = jsonParse.parseWords(resultString);

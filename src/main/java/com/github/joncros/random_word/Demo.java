@@ -1,6 +1,8 @@
 package com.github.joncros.random_word;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Demo {
@@ -21,8 +23,12 @@ public class Demo {
             service = new DatamuseWordService();
         }
         else {
-            service = new TextFileWordService(new File(choice));
-            //todo handle invalid File?
+            try {
+                service = new TextFileWordService(new File(choice));
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+                return;
+            }
         }
 
         System.out.print("What is the minimum length of the word to be generated? ");
@@ -36,6 +42,12 @@ public class Demo {
                 service,
                 new RandomLetterGenerator(ALPHABET),
                 new CLI());
-        randomWord.generateWord();
+        try {
+            randomWord.generateWord();
+        }
+        catch (IOException e) {
+            System.out.println("\nError accessing word list");
+            System.out.println(e.getMessage());
+        }
     }
 }
