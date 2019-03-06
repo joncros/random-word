@@ -19,7 +19,8 @@ public class TextFileWordService implements WordService{
      */
     public TextFileWordService(File textFile) {
         if ( !Files.exists(textFile.toPath()) )
-            throw new UncheckedIOException(new FileNotFoundException(textFile.toString()));
+            throw new UncheckedIOException(
+                    new FileNotFoundException("File not found: " + textFile.toString()));
         this.textFile = textFile;
     }
 
@@ -31,12 +32,14 @@ public class TextFileWordService implements WordService{
             String line;
             int length = s.length();
             while ((line = in.readLine()) != null) {
+                line = line.strip();
                 if (line.length() >= s.length()) {
                     String subString = line.substring(0, length);
-                    if (subString.equals(s))
+                    if (subString.equals(s)) {
                         result.add(line);
-                     else if (subString.compareToIgnoreCase(s) > 0)
+                    } else if (subString.compareToIgnoreCase(s) > 0) {
                         break;  //substring of line occurs alphabetically after s, so done searching
+                    }
                 }
             }
         } catch (IOException ex) {
@@ -48,11 +51,24 @@ public class TextFileWordService implements WordService{
     @Override
     public QueryResult findWordsStartingWith(String s, int wordLength) {
         List<String> result = new ArrayList<>();
-        // open file
-        // for line in file
-            // if line length equal to wordLength
-                // if line starts with s, add line to list
-            // if start of line is alphabetically greater than s, break
+        try (BufferedReader in
+                     = new BufferedReader(new FileReader(textFile))) {
+            String line;
+            int length = s.length();
+            while ((line = in.readLine()) != null) {
+                line = line.strip();
+                if (line.length() >= s.length()) {
+                    String subString = line.substring(0, length);
+                    if (subString.equals(s) && line.length() == wordLength) {
+                        result.add(line);
+                    } else if (subString.compareToIgnoreCase(s) > 0) {
+                        break;  //substring of line occurs alphabetically after s, so done searching
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
         return new QueryResult(result);
     }
 }
