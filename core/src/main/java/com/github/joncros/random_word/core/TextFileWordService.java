@@ -17,42 +17,53 @@ public class TextFileWordService implements WordService{
      *                 on each line of the file, and should be alphabetized.
      * @throws UncheckedIOException wrapping a FileNotFoundException if the file does not exist
      */
-    public TextFileWordService(File textFile) {
+    public TextFileWordService(File textFile) throws FileNotFoundException {
         if ( !Files.exists(textFile.toPath()) )
-            throw new UncheckedIOException(new FileNotFoundException(textFile.toString()));
+            throw new FileNotFoundException("File not found: " + textFile.toString());
         this.textFile = textFile;
     }
 
     @Override
-    public QueryResult findWordsStartingWith(String s) {
+    public QueryResult findWordsStartingWith(String s) throws  IOException {
         List<String> result = new ArrayList<>();
         try (BufferedReader in
                      = new BufferedReader(new FileReader(textFile))) {
             String line;
             int length = s.length();
             while ((line = in.readLine()) != null) {
+                line = line.strip();
                 if (line.length() >= s.length()) {
                     String subString = line.substring(0, length);
-                    if (subString.equals(s))
+                    if (subString.equals(s)) {
                         result.add(line);
-                     else if (subString.compareToIgnoreCase(s) > 0)
+                    } else if (subString.compareToIgnoreCase(s) > 0) {
                         break;  //substring of line occurs alphabetically after s, so done searching
+                    }
                 }
             }
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
         }
         return new QueryResult(result);
     }
 
     @Override
-    public QueryResult findWordsStartingWith(String s, int wordLength) {
+    public QueryResult findWordsStartingWith(String s, int wordLength) throws IOException {
         List<String> result = new ArrayList<>();
-        // open file
-        // for line in file
-            // if line length equal to wordLength
-                // if line starts with s, add line to list
-            // if start of line is alphabetically greater than s, break
+        try (BufferedReader in
+                     = new BufferedReader(new FileReader(textFile))) {
+            String line;
+            int length = s.length();
+            while ((line = in.readLine()) != null) {
+                line = line.strip();
+                if (line.length() >= s.length()) {
+                    String subString = line.substring(0, length);
+                    if (subString.equals(s) && line.length() == wordLength) {
+                        result.add(line);
+                    } else if (subString.compareToIgnoreCase(s) > 0) {
+                        break;  //substring of line occurs alphabetically after s, so done searching
+                    }
+                }
+            }
+        }
         return new QueryResult(result);
     }
 }
