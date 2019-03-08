@@ -9,12 +9,10 @@ public class Demo {
 
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
-    public static void main(String[] args ) throws InterruptedException {
+    public static void main(String[] args ) {
         System.out.println("Chooses random letters until a complete word existing in a specific list of " +
                 "words is assembled.");
         Scanner in = new Scanner(System.in);
-        // If a GUI is implemented, offer choice of CLI or GUI here
-        // If more than one WordService is implemented, offer choice of WordSevice here
         System.out.println("Type the location of a text file containing a list of words," +
                 " or leave blank to use the Datamuse service:");
         String choice = in.nextLine();
@@ -40,10 +38,13 @@ public class Demo {
                 minLength,
                 maxLength,
                 service,
-                new RandomLetterGenerator(ALPHABET),
-                new CLI());
+                new RandomLetterGenerator(ALPHABET));
+        CLI cli = new CLI(randomWord, System.out);
+
+        String word;
         try {
-            randomWord.generateWord();
+            word = randomWord.generateWord();
+            System.out.println("\nWord generated: " + word);
         }
         catch (IOException e) {
             System.out.println("\nError accessing word list");

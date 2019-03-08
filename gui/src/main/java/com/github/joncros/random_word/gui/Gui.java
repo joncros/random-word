@@ -1,6 +1,5 @@
 package com.github.joncros.random_word.gui;
 
-import com.github.joncros.random_word.core.RandomWordUI;
 import com.github.joncros.random_word.core.WordService;
 import eu.hansolo.fx.spinner.*;
 import javafx.animation.Interpolator;
@@ -38,7 +37,12 @@ import java.util.function.Function;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 
-public class Gui extends Application implements RandomWordUI {
+/**
+ * Refactor: have RandomWord expose an ObservableList<Character> (or equivalent Property). Create
+ * RandomWordObserver interface or abstract class?
+ */
+
+public class Gui extends Application {
     static final int MAX_WORD_LENGTH = 10;
     static final int NUM_SPINNERS_INITIAL = MAX_WORD_LENGTH;
 
@@ -59,8 +63,8 @@ public class Gui extends Application implements RandomWordUI {
     ObjectProperty<Object> choiceBoxValueProperty;
     enum WORD_SERVICES {
         DATAMUSE,
-        TEXTFILE;
-    };
+        TEXTFILE
+    }
 
     Label minLabel= new Label("Min Length");
     Spinner<Integer> minLengthSpinner;
@@ -201,23 +205,4 @@ public class Gui extends Application implements RandomWordUI {
         }
     }
 
-
-    @Override
-    public void display(char c, int index) {
-        chars[index] = c;
-    }
-
-    @Override
-    public void display(String s) {
-        for (int i = 0; i < s.length(); i++) {
-            chars[i] = s.charAt(i);
-        }
-    }
-
-    @Override
-    public void displayFinalWord(String s, int startIndex) throws InterruptedException {
-        for (int i = startIndex; i < s.length(); i++) {
-            chars[i] = s.charAt(i);
-        }
-    }
 }

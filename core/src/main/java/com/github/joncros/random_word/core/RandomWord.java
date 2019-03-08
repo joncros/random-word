@@ -1,13 +1,14 @@
 package com.github.joncros.random_word.core;
 
 import java.io.IOException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import java.util.Set;
 
 public class RandomWord {
-    private StringBuilder stringBuilder;
+    private ObservableList<Character> chars;
     private RandomLetterGenerator letterGenerator;
     private WordService wordService;
-    private RandomWordUI ui;
     private int minLength;
 	private int maxLength;
 
@@ -17,66 +18,78 @@ public class RandomWord {
 	private final int SMALL = 20;
 
     public RandomWord(int minLength, int maxLength, WordService wordService,
-                      RandomLetterGenerator generator, RandomWordUI ui) {
+                      RandomLetterGenerator generator) {
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.wordService = wordService;
         this.letterGenerator = generator;
-        this.ui = ui;
-        this.stringBuilder = new StringBuilder(maxLength);
+        this.chars = FXCollections.observableArrayList();
     }
 
-    public String generateWord() throws InterruptedException, IOException {
+    /**
+     * Returns an {@code ObservableList<Character>} holding the letters chosen so far
+     * @return an unmodifiable ObservableList
+     */
+    public ObservableList<Character> characterList() {
+        return FXCollections.unmodifiableObservableList(chars);
+    }
+
+    /**
+     * Returns the generated word at this point
+     * @return A String representing the entire word so far
+     */
+    public String curentWord() {
+        int size = chars.size();
+        char[] c_array = new char[size];
+        for (int i = 0; i < size; i++) {
+            c_array[i] = chars.get(i);
+        }
+        return String.valueOf(c_array);
+    }
+
+    public String generateWord() throws IOException {
 		/*
-		* Generate first two letters. append them to stringBuilder and display each in ui
+		* Generate first two letters.
 		*/
+		int current = 0; //index of next char to add to chars
         char first = letterGenerator.generate();
-        stringBuilder.append(first);
-        ui.display(first, 0);
+        chars.add(current++, first);
 
         char second = letterGenerator.generate();
-        stringBuilder.append(second);
-        ui.display(second, 1);
+        chars.add(current++, second);
 
-        String chosenWord = "";
-
-        QueryResult result = wordService.findWordsStartingWith(stringBuilder.toString())
+        QueryResult result = wordService.findWordsStartingWith(curentWord())
                 .getWordsInLengthRange(minLength, maxLength);
 
-        while (stringBuilder.length() < maxLength) {
+        while (current < maxLength) {
             if (result.getSize() == 0) {
                 //replace last letter with a new letter, assign new word list to result
                 char c = letterGenerator.generate();
-                stringBuilder.setCharAt(stringBuilder.length()-1, c);
-                ui.display(stringBuilder.toString());
-                result = wordService.findWordsStartingWith(stringBuilder.toString())
+                chars.set(--current, c);
+                result = wordService.findWordsStartingWith(curentWord())
                         .getWordsInLengthRange(minLength, maxLength);
             }
             else if (result.getSize() == 1) {
-                chosenWord = result.getWords()[0];
-
-                /*
-                * displays the remaining characters (not displayed in previous iterrations) of the final word.
-                * stringBuilder holds the letters displayed so far, so stringBuilder.length()
-                * is equal to the index of the first letter not yet displayed
-                 */
-                ui.displayFinalWord(chosenWord, stringBuilder.length());
+                String chosen = result.getWords()[0];
+                for (int i = current; i < chosen.length(); i++) {
+                    chars.add(i, chosen.charAt(i));
+                }
                 break;
             }
             else if (result.getSize() <= SMALL) {
-                Set<Character> possibleLetters = result.charsInNthPlace(stringBuilder.length());
+                Set<Character> possibleLetters = result.charsInNthPlace(current);
                 char c = letterGenerator.generate(possibleLetters);
-                stringBuilder.append(c);
-                ui.display(c, stringBuilder.length());
-                result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
+                chars.add(current, c);
+                result = result.findWordsWithLetter(c, current);
             }
             else {
                 char c = letterGenerator.generate();
-                stringBuilder.append(c);
-                ui.display(c, stringBuilder.length());
-                result = result.findWordsWithLetter(c, stringBuilder.length() - 1);
+                chars.add(current, c);
+                result = result.findWordsWithLetter(c, current);
             }
+
+            current++;
         }
-        return chosenWord;
+        return curentWord();
     }
 }
