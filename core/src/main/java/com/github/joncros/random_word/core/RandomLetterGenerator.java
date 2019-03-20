@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Generates a random letter out of those contained in the parameter letters.
  */
-class RandomLetterGenerator {
+public class RandomLetterGenerator {
     final private String letters;
     final private Random random;
 
@@ -16,7 +16,7 @@ class RandomLetterGenerator {
      * Constructs a new RandomLetterGenerator
      * @param letters a String containing all of the letters from which to choose random letters
      */
-    RandomLetterGenerator(String letters) {
+    public RandomLetterGenerator(String letters) {
         Objects.requireNonNull(letters);
         if (letters.isBlank()) {
             throw new IllegalArgumentException("letters cannot contain only whitespace");

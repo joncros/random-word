@@ -1,6 +1,6 @@
 package com.github.joncros.random_word.gui;
 
-import com.github.joncros.random_word.core.WordService;
+import com.github.joncros.random_word.core.*;
 import eu.hansolo.fx.spinner.*;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -17,9 +17,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -29,6 +27,7 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.Key;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -43,53 +42,44 @@ import static javafx.geometry.Pos.CENTER_LEFT;
  */
 
 public class Gui extends Application {
-    static final int MAX_WORD_LENGTH = 10;
-    static final int NUM_SPINNERS_INITIAL = MAX_WORD_LENGTH;
-
-    // Number of seconds a CanvasSpinnner should take to cycle from 'A' to ' '
-    static final int CYCLE_DURATION = 7;
+    private static final int MAX_WORD_LENGTH = 10;
+    private static final int NUM_SPINNERS_INITIAL = MAX_WORD_LENGTH;
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
     private Scene scene;
+    private Controller controller;
 
-    List<CanvasSpinner> spinners;
-    char[] chars;  //holds the target letter for each spinner
-    List<Timeline> timelines; //holds the timeline for each spinner
+    private List<CanvasSpinner> spinners;
 
-    Button generateButton;
-    //final EventHandler<ActionEvent> buttonEventHandler; = actionEvent -> test.animate(this);
+    private Button generateButton;
 
-    Label sourceLabel = new Label("Word Source");
-    ChoiceBox<Object> sourceChoiceBox;
-    ObjectProperty<Object> choiceBoxValueProperty;
-    enum WORD_SERVICES {
+    private Label sourceLabel = new Label("Word Source");
+    private ChoiceBox<Object> sourceChoiceBox;
+    private ObjectProperty<Object> choiceBoxValueProperty;
+    private enum WORD_SERVICES {
         DATAMUSE,
         TEXTFILE
     }
 
-    Label minLabel= new Label("Min Length");
-    Spinner<Integer> minLengthSpinner;
-    Label maxLabel = new Label("Max Length");
-    Spinner<Integer> maxLengthSpinner;
+    private Label minLabel= new Label("Min Length");
+    private Spinner<Integer> minLengthSpinner;
+    private Label maxLabel = new Label("Max Length");
+    private Spinner<Integer> maxLengthSpinner;
+
+    private Label wordLabel = new Label("Generated Word");
+    private TextField wordField = new TextField();
 
     @Override
     public void init() {
         //create NUM_SPINNERS_INITIAL spinnners
         spinners = new ArrayList<>();
-        chars = new char[NUM_SPINNERS_INITIAL];
         for (int i = 0; i < NUM_SPINNERS_INITIAL; i++) {
             spinners.add(i, new CanvasSpinner(SpinnerType.ALPHABETIC));
         }
-        timelines = new ArrayList<>();
-
-//        Display ' ' initially on all spinners
-//        for (int i = 0; i < NUM_SPINNERS_INITIAL; i++) {
-//            spinners.get(i).setValue(27);
-//        }
 
         //create button
         generateButton = new Button("Generate Word");
-        //set button action
-        //generateButton.setOnAction(buttonEventHandler);
+        generateButton.setOnAction(actionEvent -> generate());
 
         //create control to choose word source
         sourceChoiceBox = new ChoiceBox<>();
@@ -146,7 +136,11 @@ public class Gui extends Application {
         controls.setSpacing(10);
         controls.setAlignment(CENTER_LEFT);
 
-        VBox vBox = new VBox(spinnerBox, controls, generateButton);
+        HBox controls2 = new HBox(generateButton, wordLabel, wordField);
+        controls2.setSpacing(10);
+        controls2.setAlignment(CENTER_LEFT);
+
+        VBox vBox = new VBox(spinnerBox, controls, controls2);
         vBox.setPadding(new Insets(10));
         vBox.setSpacing(10);
         spinnerBox.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -184,25 +178,40 @@ public class Gui extends Application {
         return selected;
     }
 
-    /*
-    Converts a char into the int value, in the range 0-27, required to display it on a
-    eu.hansolo.fx alphabetic Spinner. Alphabetic spinners have the characters A-Z and space.
-    lowercase letters are converted to uppercase, and any non-letter character is converted to
-    a space.
-    */
-    int convert(char c) {
-        if (c == ' ') {
-            return 27;
+    /**
+     * Button event handler for the "Generate Word" button
+     */
+    private void generate() {
+        WordService wordService = null;
+        // TODO handle exception by popup
+        Object sourceChoice = sourceChoiceBox.getValue();
+        if (sourceChoice instanceof File) {
+            try {
+                wordService = new TextFileWordService((File) sourceChoice);
+            } catch (IOException e) {
+                printException(Thread.currentThread(), e);
+            }
+        } else {
+            wordService = new DatamuseWordService();
         }
-        else if (c >= 65 && c <= 90) {  //uppercase letters
-            return c - 65;
+        controller = new Controller(
+                new RandomWord(
+                        minLengthSpinner.getValue(),
+                        maxLengthSpinner.getValue(),
+                        wordService,
+                        new RandomLetterGenerator(ALPHABET)
+                ),
+                spinners);
+        try {
+            String word = controller.generateRandomWord();
+            wordField.setText(word);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-        else if (c >= 97 && c <= 122) {  //lowercase letters, c - 65 - 32
-            return c - 97;
-        }
-        else {  //character not present on Alphabetic spinners
-            return 27;
-        }
+    }
+
+    private static void printException(Thread t, Throwable e) {
+        System.out.print(e.getMessage());
     }
 
 }
