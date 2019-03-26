@@ -2,6 +2,9 @@ package com.github.joncros.random_word.gui;
 
 import com.github.joncros.random_word.core.RandomWord;
 import eu.hansolo.fx.spinner.CanvasSpinner;
+import eu.hansolo.fx.spinner.Spinner;
+import eu.hansolo.fx.spinner.event.SpinnerEvent;
+import eu.hansolo.fx.spinner.event.SpinnerObserver;
 import javafx.animation.AnimationTimer;
 import javafx.collections.ListChangeListener;
 
@@ -15,12 +18,7 @@ class Controller {
     private static final double ANIMATION_RATE = 250;
 
     private RandomWord randomWord;
-
-    private AnimationTimer timer;
-    private long lastTimerCall;
-
-    //Time that should elapse between timer calls
-    private final long INTERVAL = 250_000_000L;
+    private String word;
 
     private ListChangeListener<Character> randomWordListener;
 
@@ -35,42 +33,35 @@ class Controller {
 
     Controller(RandomWord randomWord, List<CanvasSpinner> spinners) {
         this.randomWord = randomWord;
+        this.word = null;
         numSpinners = spinners.size();
 
         spinnerWrappers = new ArrayList<>();
         for (var spinner : spinners) {
-            spinnerWrappers.add(new SpinnerWrapper(spinner, ANIMATION_RATE));
+            SpinnerWrapper sw = new SpinnerWrapper(spinner, ANIMATION_RATE);
+            spinnerWrappers.add(sw);
         }
 
         randomWordListener = change -> {
             while (change.next()) {
                 for (int i = change.getFrom(); i < change.getTo(); i++) {
                     Character c = randomWord.characterList().get(i);
-                    //todo
+                    // todo add character to SpinnerWrapper's target queue;
+                    // start spinner if currently stopped
                 }
             }
         };
 
-        lastTimerCall = System.nanoTime();
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (now > lastTimerCall + INTERVAL) {
-                    for (int i = 0; i < numSpinners; i++) {
-                        //todo
-                        // if spinnner has target and spinner value == target
-                        // stop at target
-                        // else spinUp() spinner
-                    }
-                    lastTimerCall = now;
-                }
-            }
-        };
     }
 
     String generateRandomWord() throws IOException {
-        timer.start();
-        return "";
+        // for all SpinnerWrappers, call start()
+        word = randomWord.generateWord();
+        /*
+        when last used spinner (index word.length() - 1) finished spinning to last target, call
+        spinToEnd on all remaining spinners (index >= word.length())
+         */
+        return word;
     }
 
     /*
