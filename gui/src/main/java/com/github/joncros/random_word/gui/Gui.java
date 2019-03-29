@@ -1,45 +1,26 @@
 package com.github.joncros.random_word.gui;
 
 import com.github.joncros.random_word.core.*;
-import eu.hansolo.fx.spinner.*;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import eu.hansolo.fx.spinner.CanvasSpinner;
+import eu.hansolo.fx.spinner.SpinnerType;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Key;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
-
-/**
- * Refactor: have RandomWord expose an ObservableList<Character> (or equivalent Property). Create
- * RandomWordObserver interface or abstract class?
- */
 
 public class Gui extends Application {
     private static final int MAX_WORD_LENGTH = 10;
@@ -77,7 +58,6 @@ public class Gui extends Application {
             spinners.add(i, new CanvasSpinner(SpinnerType.ALPHABETIC));
         }
 
-        //create button
         generateButton = new Button("Generate Word");
         generateButton.setOnAction(actionEvent -> generate());
 

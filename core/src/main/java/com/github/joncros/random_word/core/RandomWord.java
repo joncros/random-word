@@ -1,8 +1,9 @@
 package com.github.joncros.random_word.core;
 
-import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.io.IOException;
 import java.util.Set;
 
 public class RandomWord {
@@ -38,7 +39,7 @@ public class RandomWord {
      * Returns the generated word at this point
      * @return A String representing the entire word so far
      */
-    public String curentWord() {
+    public String currentWord() {
         int size = chars.size();
         char[] c_array = new char[size];
         for (int i = 0; i < size; i++) {
@@ -48,6 +49,9 @@ public class RandomWord {
     }
 
     public String generateWord() throws IOException {
+        // reset chars in case generateWord called more than once
+        chars.clear();
+
 		/*
 		* Generate first two letters.
 		*/
@@ -58,7 +62,7 @@ public class RandomWord {
         char second = letterGenerator.generate();
         chars.add(current++, second);
 
-        QueryResult result = wordService.findWordsStartingWith(curentWord())
+        QueryResult result = wordService.findWordsStartingWith(currentWord())
                 .getWordsInLengthRange(minLength, maxLength);
 
         while (current < maxLength) {
@@ -66,7 +70,7 @@ public class RandomWord {
                 //replace last letter with a new letter, assign new word list to result
                 char c = letterGenerator.generate();
                 chars.set(--current, c);
-                result = wordService.findWordsStartingWith(curentWord())
+                result = wordService.findWordsStartingWith(currentWord())
                         .getWordsInLengthRange(minLength, maxLength);
             }
             else if (result.getSize() == 1) {
@@ -90,6 +94,6 @@ public class RandomWord {
 
             current++;
         }
-        return curentWord();
+        return currentWord();
     }
 }
