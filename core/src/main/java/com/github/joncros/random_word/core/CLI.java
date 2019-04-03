@@ -22,11 +22,9 @@ public class CLI {
         charList.addListener((ListChangeListener<Character>) change -> {
             while (change.next()) {
                 if (change.wasReplaced()) {
-                    //print entire word on a new line
-                    ps.print("\n" + randomWord.curentWord());
+                    ps.print("\n" + randomWord.currentWord());
                 } else if (change.wasAdded()) {
                     for (int i = change.getFrom(); i < change.getTo(); i++) {
-                        //print added letter(s) to current line
                         ps.print(charList.get(i));
                     }
                 }

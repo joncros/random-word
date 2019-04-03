@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
  */
 public class QueryResult {
     private List<String> words;
-    //private Map<Integer,String> wordsByLength;
 
     public QueryResult(List<String> words) {
         Objects.requireNonNull(words);
@@ -90,18 +89,6 @@ public class QueryResult {
             throw new IllegalArgumentException("parameter s must have length of at least 1");
         List<String> newList;
 
-        /*
-         * Loop implementation
-         * newList = new ArrayList<>();
-        for (String word : words) {
-            if (word.length() >= length) {
-                String subStr = word.substring(0,length);
-                if (subStr.equals(s))
-                    newList.add(word);
-            }
-        }
-         */
-
         newList = words.stream()
                 .filter(word -> word.length() >= length)
                 .filter(word -> word.substring(0, length).equals(s))
@@ -131,8 +118,8 @@ public class QueryResult {
      * Returns a Set consisting of all of the characters occuring in the nth position of the words in the QueryResult.
      * i.e. for the words apple, orange, grape, if n = 2 the set would contain a and p
      * @param n position in each of the words to examine. n=0 examines the first letter in each word.
-     * @return A set of the letters occuring in the nth position in the words, or an empty set if none of the words
-     * have a letter in the nth place (that is, if n is greater than length-1 for all words in the QueryResult)
+     * @return A set of the letters, or an empty set if none of the words have a letter in the nth place
+     * (that is, if n is greater than length-1 for all words in the QueryResult)
      */
     public Set<Character> charsInNthPlace(int n) {
         if (n < 0)

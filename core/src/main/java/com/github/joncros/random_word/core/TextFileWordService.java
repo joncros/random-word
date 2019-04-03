@@ -15,7 +15,7 @@ public class TextFileWordService implements WordService{
      * Constructs a TextFileWordService instance
      * @param textFile a text file. file should be formatted so that there is single word
      *                 on each line of the file, and should be alphabetized.
-     * @throws UncheckedIOException wrapping a FileNotFoundException if the file does not exist
+     * @throws FileNotFoundException if the file does not exist
      */
     public TextFileWordService(File textFile) throws FileNotFoundException {
         if ( !Files.exists(textFile.toPath()) )

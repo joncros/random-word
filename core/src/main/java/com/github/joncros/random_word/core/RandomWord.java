@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 
 public class RandomWord {
@@ -18,8 +19,23 @@ public class RandomWord {
       */
 	private final int SMALL = 20;
 
+    /**
+     *
+     * @param minLength minimum word length, greater than or equal to zero
+     * @param maxLength maximum word length, greater than or equal to minLength
+     * @param wordService a WordService to query for words
+     * @param generator a RandomLetterGenerator
+     */
     public RandomWord(int minLength, int maxLength, WordService wordService,
                       RandomLetterGenerator generator) {
+        Objects.requireNonNull(wordService);
+        Objects.requireNonNull(generator);
+        if (minLength < 0) {
+            throw new IllegalArgumentException("minLength parameter less than zero");
+        }
+        if (maxLength < minLength) {
+            throw new IllegalArgumentException("maxLength parameter less than minLength");
+        }
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.wordService = wordService;
@@ -48,6 +64,12 @@ public class RandomWord {
         return String.valueOf(c_array);
     }
 
+    /**
+     * Returns a word (assembled from random letters) that is present in the word list provided by
+     * wordService
+     * @return a String
+     * @throws IOException if wordService throws an IOException (disk or network access error)
+     */
     public String generateWord() throws IOException {
         // reset chars in case generateWord called more than once
         chars.clear();
