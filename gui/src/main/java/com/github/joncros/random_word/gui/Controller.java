@@ -91,8 +91,18 @@ class Controller {
             wrapper.start();
         }
 
-        word = randomWord.generateWord();
-        charList.removeListener(randomWordListener);
+        try {
+            word = randomWord.generateWord();
+        }
+        catch (IOException e){
+            for (SpinnerWrapper wrapper : spinnerWrappers) {
+                wrapper.stop();
+            }
+            throw e;
+        }
+        finally {
+            charList.removeListener(randomWordListener);
+        }
         return word;
     }
 

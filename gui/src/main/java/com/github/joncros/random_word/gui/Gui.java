@@ -17,6 +17,8 @@ import javafx.util.StringConverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +111,8 @@ public class Gui extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Thread.setDefaultUncaughtExceptionHandler(Gui::errorDialogue);
+
         HBox spinnerBox = new HBox();
         spinnerBox.getChildren().addAll(spinners);
 
@@ -186,12 +190,43 @@ public class Gui extends Application {
             String word = controller.generateRandomWord();
             wordField.setText(word);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            errorDialogue(Thread.currentThread(), e);
         }
     }
 
     private static void printException(Thread t, Throwable e) {
         System.out.print(e.getMessage());
+    }
+
+    private static void errorDialogue(Thread t, Throwable e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        if (e instanceof IOException) {
+            alert.setHeaderText("Error accessing word list");
+        }
+        alert.setContentText(e.getMessage());
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String exceptionText = sw.toString();
+
+        Label label = new Label("Exception Stacktrace:");
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane exPane = new GridPane();
+        exPane.setMaxWidth(Double.MAX_VALUE);
+        exPane.add(label, 0, 0);
+        exPane.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(exPane);
+        alert.show();
     }
 
 }
